@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.LicaicanpinDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yewurenyuan_id as yewurenyuanId
+        ,a.licaicanpin_uuid_number as licaicanpinUuidNumber
+        ,a.licaicanpin_name as licaicanpinName
+        ,a.licaicanpin_types as licaicanpinTypes
+        ,a.licaicanpin_jine as licaicanpinJine
+        ,a.licaicanpin_fenshu as licaicanpinFenshu
+        ,a.licaicanpin_content as licaicanpinContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.LicaicanpinView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,yewurenyuan.yewurenyuan_uuid_number as yewurenyuanUuidNumber
+        ,yewurenyuan.yewurenyuan_name as yewurenyuanName
+        ,yewurenyuan.yewurenyuan_phone as yewurenyuanPhone
+        ,yewurenyuan.yewurenyuan_id_number as yewurenyuanIdNumber
+        ,yewurenyuan.yewurenyuan_photo as yewurenyuanPhoto
+        ,yewurenyuan.yewurenyuan_email as yewurenyuanEmail
+
+        FROM licaicanpin  a
+        left JOIN yewurenyuan yewurenyuan ON a.yewurenyuan_id = yewurenyuan.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.yewurenyuanId != null and params.yewurenyuanId != ''">
+                and (
+                    a.yewurenyuan_id = #{params.yewurenyuanId}
+                )
+            </if>
+            <if test=" params.licaicanpinUuidNumber != '' and params.licaicanpinUuidNumber != null and params.licaicanpinUuidNumber != 'null' ">
+                and a.licaicanpin_uuid_number like CONCAT('%',#{params.licaicanpinUuidNumber},'%')
+            </if>
+            <if test=" params.licaicanpinName != '' and params.licaicanpinName != null and params.licaicanpinName != 'null' ">
+                and a.licaicanpin_name like CONCAT('%',#{params.licaicanpinName},'%')
+            </if>
+            <if test="params.licaicanpinTypes != null and params.licaicanpinTypes != ''">
+                and a.licaicanpin_types = #{params.licaicanpinTypes}
+            </if>
+            <if test="params.licaicanpinJineStart != null ">
+                <![CDATA[  and a.licaicanpin_jine >= #{params.licaicanpinJineStart}   ]]>
+            </if>
+            <if test="params.licaicanpinJineEnd != null ">
+                <![CDATA[  and a.licaicanpin_jine <= #{params.licaicanpinJineEnd}   ]]>
+            </if>
+            <if test="params.licaicanpinFenshuStart != null and params.licaicanpinFenshuStart != ''">
+                <![CDATA[  and a.licaicanpin_fenshu >= #{params.licaicanpinFenshuStart}   ]]>
+            </if>
+            <if test="params.licaicanpinFenshuEnd != null and params.licaicanpinFenshuEnd != ''">
+                <![CDATA[  and a.licaicanpin_fenshu <= #{params.licaicanpinFenshuEnd}   ]]>
+            </if>
+             <if test="params.licaicanpinFenshu != null and params.licaicanpinFenshu != ''">
+                and a.licaicanpin_fenshu = #{params.licaicanpinFenshu}
+             </if>
+            <if test=" params.licaicanpinContent != '' and params.licaicanpinContent != null and params.licaicanpinContent != 'null' ">
+                and a.licaicanpin_content like CONCAT('%',#{params.licaicanpinContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断业务人员的id不为空 -->
+            <if test=" params.yewurenyuanIdNotNull != '' and params.yewurenyuanIdNotNull != null and params.yewurenyuanIdNotNull != 'null' ">
+                and a.yewurenyuan_id IS NOT NULL
+            </if>
+            <if test=" params.yewurenyuanUuidNumber != '' and params.yewurenyuanUuidNumber != null and params.yewurenyuanUuidNumber != 'null' ">
+                and yewurenyuan.yewurenyuan_uuid_number like CONCAT('%',#{params.yewurenyuanUuidNumber},'%')
+            </if>
+            <if test=" params.yewurenyuanName != '' and params.yewurenyuanName != null and params.yewurenyuanName != 'null' ">
+                and yewurenyuan.yewurenyuan_name like CONCAT('%',#{params.yewurenyuanName},'%')
+            </if>
+            <if test=" params.yewurenyuanPhone != '' and params.yewurenyuanPhone != null and params.yewurenyuanPhone != 'null' ">
+                and yewurenyuan.yewurenyuan_phone like CONCAT('%',#{params.yewurenyuanPhone},'%')
+            </if>
+            <if test=" params.yewurenyuanIdNumber != '' and params.yewurenyuanIdNumber != null and params.yewurenyuanIdNumber != 'null' ">
+                and yewurenyuan.yewurenyuan_id_number like CONCAT('%',#{params.yewurenyuanIdNumber},'%')
+            </if>
+            <if test=" params.yewurenyuanEmail != '' and params.yewurenyuanEmail != null and params.yewurenyuanEmail != 'null' ">
+                and yewurenyuan.yewurenyuan_email like CONCAT('%',#{params.yewurenyuanEmail},'%')
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
